@@ -1,0 +1,34 @@
+Syndication::ESF - Create and update ESF files
+
+This module is the basic framework for creating and maintaing Epistula Syndication
+Format (ESF) files. More information on the format can be found at the Aquarionics
+web site: http://www.aquarionics.com/article/name/esf
+
+This module tries to copy the XML::RSS module's interface. All applicable methods
+have been copied and should respond in the same manner.
+
+Like in XML::RSS, channel data is accessed through the C<channel()> sub, and item
+data is accessed straight out of the items array.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+AUTHOR
+
+Brian Cassidy <bricas@cpan.org>
+
+
+COPYRIGHT AND LICENSE
+
+Copyright 2005 by Brian Cassidy
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
