@@ -1,8 +1,8 @@
+Build.PL
 Changes
 lib/Syndication/ESF.pm
-Makefile.PL
 MANIFEST
-README
+META.yml
 t/01-use.t
 t/10-read.t
 t/20-write.t

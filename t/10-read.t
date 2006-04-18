@@ -7,13 +7,9 @@ my $esf = Syndication::ESF->new;
 ok( defined $esf, "new() returned something" );
 ok( $esf->isa( 'Syndication::ESF' ), "it's the right class" );
 
-my $data;
-open( FILE, 't/test.esf' );
-{
-	local $/;
-	$data = <FILE>;
-}
-close( FILE );
+open( my $input, 't/test.esf' );
+my $data = do { local $/; <$input> };
+close( $input );
 
 $esf->parse( $data );
 
@@ -32,11 +28,11 @@ my $data2 = $esf->as_string;
 is ( length( $data2 ), 579, 'astring()' );
 
 sub test_fields {
-	my $esf = shift;
+    my $esf = shift;
 
-	is( $esf->channel( 'title' ), 'Aquarionics', "channel( 'title' )" );
-	is( $esf->channel( 'contact' ), 'aquarion@aquarionics.com (Aquarion)', "channel( 'contact' )" );
-	is( $esf->channel( 'link' ), 'http://www.aquarionics.com/', "channel( 'link' )" );
-	is( $esf->contact_name, 'Aquarion', "contact_name()" );
-	is( $esf->contact_email, 'aquarion@aquarionics.com', "contact_email()" );
+    is( $esf->channel( 'title' ), 'Aquarionics', "channel( 'title' )" );
+    is( $esf->channel( 'contact' ), 'aquarion@aquarionics.com (Aquarion)', "channel( 'contact' )" );
+    is( $esf->channel( 'link' ), 'http://www.aquarionics.com/', "channel( 'link' )" );
+    is( $esf->contact_name, 'Aquarion', "contact_name()" );
+    is( $esf->contact_email, 'aquarion@aquarionics.com', "contact_email()" );
 }

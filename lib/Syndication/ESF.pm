@@ -6,26 +6,26 @@ Syndication::ESF - Create and update ESF files
 
 =head1 SYNOPSIS
 
-	use Syndication::ESF;
+    use Syndication::ESF;
 
-	my $esf = Syndication::ESF->new;
+    my $esf = Syndication::ESF->new;
 
-	$esf->parsefile( 'my.esf' );
+    $esf->parsefile( 'my.esf' );
 
-	$esf->channel( title => 'My channel' );
+    $esf->channel( title => 'My channel' );
 
-	$esf->add_item(
-		date  => time,
-		title => 'new item',
-		link  => 'http://example.org/#foo'
-	);
+    $esf->add_item(
+        date  => time,
+        title => 'new item',
+        link  => 'http://example.org/#foo'
+    );
 
-	print "Channel: ", $esf->channel( 'title' ), "\n";
-	print "Items  : ", scalar @{ $esf->{ items } }, "\n";
+    print "Channel: ", $esf->channel( 'title' ), "\n";
+    print "Items  : ", scalar @{ $esf->{ items } }, "\n";
 
-	my $output = $esf->as_string;
+    my $output = $esf->as_string;
 
-	$esf->save( 'my.esf' );
+    $esf->save( 'my.esf' );
 
 =head1 DESCRIPTION
 
@@ -39,13 +39,29 @@ have been copied and should respond in the same manner.
 Like in XML::RSS, channel data is accessed through the C<channel()> sub, and item
 data is accessed straight out of the items array.
 
+=head1 INSTALLATION
+
+To install this module via Module::Build:
+
+	perl Build.PL
+	./Build         # or `perl Build`
+	./Build test    # or `perl Build test`
+	./Build install # or `perl Build install`
+
+To install this module via ExtUtils::MakeMaker:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
 =cut
 
 use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.06';
+our $VERSION = '0.1';
 
 # Defines the set of valid fields for a channel and its items
 my @channel_fields = qw( title contact link );
@@ -60,15 +76,15 @@ Creates a new Syndication::ESF object. It currently does not accept any paramete
 =cut
 
 sub new {
-	my $class = shift;
-	my $self = {
-		channel => {},
-		items   => []
-	};
+    my $class = shift;
+    my $self = {
+        channel => {},
+        items   => []
+    };
 
-	bless $self, $class;
+    bless $self, $class;
 
-	return $self;
+    return $self;
 }
 
 =head2 channel(title => $title, contact => $contact, link => $link)
@@ -80,32 +96,32 @@ data with the supplied values.
 =cut
 
 sub channel {
-	my $self = shift;
+    my $self = shift;
 
-	# accessor; if there's only one arg
-	if ( @_ == 1 ) {
-		return $self->{ channel }->{ $_[0] };
-	}
-	# mutator; if there's more than one arg
-	elsif ( @_ > 1 ) {
-		my %hash = @_;
+    # accessor; if there's only one arg
+    if ( @_ == 1 ) {
+        return $self->{ channel }->{ $_[0] };
+    }
+    # mutator; if there's more than one arg
+    elsif ( @_ > 1 ) {
+        my %options = @_;
 
-		foreach (keys %hash) {
-			$self->{ channel }->{ $_ } = $hash{ $_ };
+        for( keys %options ) {
+            $self->{ channel }->{ $_ } = $options{ $_ };
 
-			# extract email and name from contact info
-			if( $_ eq 'contact' ) {
-				my @contact = split( / /, $hash{ $_ }, 2 );
-				$contact[ 1 ] =~ s/[\(\)]//g;
-				$self->channel(
-					'contact_name'  => $contact[ 1 ],
-					'contact_email' => $contact[ 0 ]
-				);
-			}
-		}	
-	}
+            # extract email and name from contact info
+            if( $_ eq 'contact' ) {
+                my @contact = split( / /, $options{ $_ }, 2 );
+                $contact[ 1 ] =~ s/[\(\)]//g;
+                $self->channel(
+                    'contact_name'  => $contact[ 1 ],
+                    'contact_email' => $contact[ 0 ]
+                );
+            }
+        }    
+    }
 
-	return $self->{ channel };
+    return $self->{ channel };
 }
 
 =head2 contact_name()
@@ -115,8 +131,8 @@ shortcut to get the contact name
 =cut
 
 sub contact_name {
-	my $self = shift;
-	return $self->channel( 'contact_name' );
+    my $self = shift;
+    return $self->channel( 'contact_name' );
 }
 
 =head2 contact_email()
@@ -126,8 +142,8 @@ shortcut to get the contact email
 =cut
 
 sub contact_email {
-	my $self = shift;
-	return $self->channel( 'contact_email' );
+    my $self = shift;
+    return $self->channel( 'contact_email' );
 }
 
 =head2 add_item(date => $date, title => $title, link => $link, mode => $mode)
@@ -138,20 +154,20 @@ C<'insert'> for the C<mode> parameter adds it to the front of the list.
 =cut
 
 sub add_item {
-	my $self = shift;
-	my $hash = { @_ };
-	my $mode = $hash->{ mode };
+    my $self    = shift;
+    my $options = { @_ };
+    my $mode    = $options->{ mode };
 
-	# depending on the mode, add the item to the
-	# start or end of the feed
-	if ( $mode and $mode eq 'insert' ) {
-		unshift ( @{ $self->{ items } }, $hash );
-	}
-	else {
-		push ( @{ $self->{ items } }, $hash );
-	}
+    # depending on the mode, add the item to the
+    # start or end of the feed
+    if ( $mode and $mode eq 'insert' ) {
+        unshift ( @{ $self->{ items } }, $options );
+    }
+    else {
+        push ( @{ $self->{ items } }, $options );
+    }
 
-	return $self->{ items };
+    return $self->{ items };
 }
 
 =head2 parse($string)
@@ -161,34 +177,34 @@ Parse the supplied raw ESF data.
 =cut
 
 sub parse {
-	my $self = shift;
-	my $data = shift;
+    my $self = shift;
+    my $data = shift;
 
-	# boolean to indicate if we're parsing the meta data or the items.
-	my $metamode  = 1;
+    # boolean to indicate if we're parsing the meta data or the items.
+    my $metamode  = 1;
 
-	foreach my $line ( split /(?:\015\012|\012|\015)/, $data ) {
-		# skip to the next line if it's a comment
-		next if $line =~ /^#/;
+    foreach my $line ( split /(?:\015\012|\012|\015)/, $data ) {
+        # skip to the next line if it's a comment
+        next if $line =~ /^#/;
 
-		chomp( $line );
+        chomp( $line );
 
-		# if it's a blank line, get out of meta-mode.
-		if ( $line eq '' ) {
-			$metamode = 0;
-			next;
-		}
+        # if it's a blank line, get out of meta-mode.
+        if ( $line eq '' ) {
+            $metamode = 0;
+            next;
+        }
 
-		my @data = split /\t/, $line;
+        my @data = split /\t/, $line;
 
-		# depending on what mode we're in, insert the channel, or item data.
-		if ( $metamode ) {
-			$self->channel( $data[0] => $data[1] );
-		}
-		else {
-			push @{ $self->{ items } }, { map { $item_fields[$_] => $data[$_] } 0..$#item_fields };
-		}
-	}
+        # depending on what mode we're in, insert the channel, or item data.
+        if ( $metamode ) {
+            $self->channel( $data[ 0 ] => $data[ 1 ] );
+        }
+        else {
+            push @{ $self->{ items } }, { map { $item_fields[ $_ ] => $data[ $_ ] } 0..$#item_fields };
+        }
+    }
 }
 
 =head2 parsefile($filename)
@@ -198,16 +214,16 @@ Same as C<parse()>, but takes a filename as input.
 =cut
 
 sub parsefile {
-	my $self = shift;
-	my $file = shift;
+    my $self = shift;
+    my $file = shift;
 
-	open( FILE, $file ) or croak "File open error ($file): $!";
+    open( my $esf, $file ) or croak "File open error ($file): $!";
 
-	my $data = do { local $/; <FILE>; };
+    my $data = do { local $/; <$esf>; };
 
-	close( FILE ) or carp( "File close error ($file): $!" );
+    close( $esf ) or carp( "File close error ($file): $!" );
 
-	$self->parse( $data );
+    $self->parse( $data );
 }
 
 =head2 as_string()
@@ -217,21 +233,21 @@ Returns the current data stored in the object as a string.
 =cut
 
 sub as_string {
-	my $self = shift;
+    my $self = shift;
 
-	my $data;
+    my $data;
 
-	# append channel data
-	$data .= "$_\t" . $self->channel( $_ ) . "\n" for @channel_fields;
-	$data .= "\n";
+    # append channel data
+    $data .= "$_\t" . $self->channel( $_ ) . "\n" for @channel_fields;
+    $data .= "\n";
 
-	# append item data
-	foreach my $item ( @{ $self->{ items } } ) {
-		$data .= $item->{ $_ } . "\t" for @item_fields;
-		$data =~ s/\t$/\n/;
-	}
+    # append item data
+    foreach my $item ( @{ $self->{ items } } ) {
+        $data .= $item->{ $_ } . "\t" for @item_fields;
+        $data =~ s/\t$/\n/;
+    }
 
-	return $data;
+    return $data;
 }
 
 =head2 save($filename)
@@ -241,14 +257,14 @@ Saves the value of C<as_string()> to the supplied filename.
 =cut
 
 sub save {
-	my $self = shift;
-	my $file = shift;
+    my $self = shift;
+    my $file = shift;
 
-	open( FILE, ">$file" ) or croak "File open error ($file): $!";
+    open( my $esf, ">$file" ) or croak "File open error ($file): $!";
 
-	print FILE $self->as_string;
+    print { $esf } $self->as_string;
 
-	close( FILE ) or carp( "File close error ($file): $!" );
+    close( $esf ) or carp( "File close error ($file): $!" );
 }
 
 =head1 AUTHOR
@@ -261,14 +277,18 @@ sub save {
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2005 by Brian Cassidy
+Copyright 2006 by Brian Cassidy
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 
 
 =head1 SEE ALSO
 
-XML::RSS
+=over 4
+
+=item * L<XML::RSS>
+
+=back
 
 =cut
 

@@ -1,5 +1,9 @@
 Revision history for Perl extension Syndication::ESF.
 
+0.1   Tue Apr 18 2006
+	- minor code cleanup
+	- switch to Module::Build
+
 0.06  Fri Mar 04 2005
 	- made file parsing more portable (thanks RJBS)
 
