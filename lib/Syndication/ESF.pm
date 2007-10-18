@@ -41,19 +41,10 @@ data is accessed straight out of the items array.
 
 =head1 INSTALLATION
 
-To install this module via Module::Build:
-
-	perl Build.PL
-	./Build         # or `perl Build`
-	./Build test    # or `perl Build test`
-	./Build install # or `perl Build install`
-
-To install this module via ExtUtils::MakeMaker:
-
-	perl Makefile.PL
-	make
-	make test
-	make install
+    perl Makefile.PL
+    make
+    make test
+    make install
 
 =cut
 
@@ -61,7 +52,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.1';
+our $VERSION = '0.11';
 
 # Defines the set of valid fields for a channel and its items
 my @channel_fields = qw( title contact link );
@@ -77,7 +68,7 @@ Creates a new Syndication::ESF object. It currently does not accept any paramete
 
 sub new {
     my $class = shift;
-    my $self = {
+    my $self  = {
         channel => {},
         items   => []
     };
@@ -100,17 +91,18 @@ sub channel {
 
     # accessor; if there's only one arg
     if ( @_ == 1 ) {
-        return $self->{ channel }->{ $_[0] };
+        return $self->{ channel }->{ $_[ 0 ] };
     }
+
     # mutator; if there's more than one arg
     elsif ( @_ > 1 ) {
         my %options = @_;
 
-        for( keys %options ) {
+        for ( keys %options ) {
             $self->{ channel }->{ $_ } = $options{ $_ };
 
             # extract email and name from contact info
-            if( $_ eq 'contact' ) {
+            if ( $_ eq 'contact' ) {
                 my @contact = split( / /, $options{ $_ }, 2 );
                 $contact[ 1 ] =~ s/[\(\)]//g;
                 $self->channel(
@@ -118,7 +110,7 @@ sub channel {
                     'contact_email' => $contact[ 0 ]
                 );
             }
-        }    
+        }
     }
 
     return $self->{ channel };
@@ -161,10 +153,10 @@ sub add_item {
     # depending on the mode, add the item to the
     # start or end of the feed
     if ( $mode and $mode eq 'insert' ) {
-        unshift ( @{ $self->{ items } }, $options );
+        unshift( @{ $self->{ items } }, $options );
     }
     else {
-        push ( @{ $self->{ items } }, $options );
+        push( @{ $self->{ items } }, $options );
     }
 
     return $self->{ items };
@@ -181,9 +173,10 @@ sub parse {
     my $data = shift;
 
     # boolean to indicate if we're parsing the meta data or the items.
-    my $metamode  = 1;
+    my $metamode = 1;
 
     foreach my $line ( split /(?:\015\012|\012|\015)/, $data ) {
+
         # skip to the next line if it's a comment
         next if $line =~ /^#/;
 
@@ -202,7 +195,9 @@ sub parse {
             $self->channel( $data[ 0 ] => $data[ 1 ] );
         }
         else {
-            push @{ $self->{ items } }, { map { $item_fields[ $_ ] => $data[ $_ ] } 0..$#item_fields };
+            push @{ $self->{ items } },
+                { map { $item_fields[ $_ ] => $data[ $_ ] }
+                    0 .. $#item_fields };
         }
     }
 }
@@ -269,15 +264,11 @@ sub save {
 
 =head1 AUTHOR
 
-=over 4 
-
-=item * Brian Cassidy E<lt>bricas@cpan.orgE<gt>
-
-=back
+Brian Cassidy E<lt>bricas@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2006 by Brian Cassidy
+Copyright 2007 by Brian Cassidy
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 
