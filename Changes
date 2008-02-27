@@ -1,5 +1,8 @@
 Revision history for Perl extension Syndication::ESF.
 
+0.12  Wed Feb 27 2008
+    - Module::Install update
+
 0.11  Thu Oct 18 2007
     - fix versioning
     - repackaged with Module::Install

@@ -1,8 +1,10 @@
-use inc::Module::Install 0.67;
+use inc::Module::Install 0.68;
 
-if( -e 'MANIFEST.SKIP' ) {
+if ( -e 'MANIFEST.SKIP' ) {
     system( 'pod2text lib/Syndication/ESF.pm > README' );
 }
+
+perl_version '5.006';
 
 name 'Syndication-ESF';
 all_from 'lib/Syndication/ESF.pm';
