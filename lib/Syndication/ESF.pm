@@ -52,7 +52,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 # Defines the set of valid fields for a channel and its items
 my @channel_fields = qw( title contact link );
@@ -268,7 +268,7 @@ Brian Cassidy E<lt>bricas@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2008 by Brian Cassidy
+Copyright 2003-2009 by Brian Cassidy
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 

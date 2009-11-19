@@ -1,4 +1,4 @@
-use inc::Module::Install 0.68;
+use inc::Module::Install 0.91;
 
 if ( -e 'MANIFEST.SKIP' ) {
     system( 'pod2text lib/Syndication/ESF.pm > README' );
@@ -11,5 +11,6 @@ all_from 'lib/Syndication/ESF.pm';
 
 test_requires 'Test::More';
 
-auto_install;
+repository "http://github.com/bricas/syndication-esf/tree/master";
+
 WriteAll;
